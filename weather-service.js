@@ -11,6 +11,16 @@ app.use(express.json());
 const apiKey = "d05058736ec59342f611b738e32d7a1c";
 const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&lang=zh_cn&q=";//修改语言
 
+
+/**
+ * 天气查询服务
+ * @param {Object} req - 请求对象，包含城市名称
+ * @param {string} req.body.city - 城市名称
+ * @returns {Object} res - 响应对象
+ * @returns {Object} res.body - 天气信息
+ * @returns {string} res.body.error - 错误信息（如果有）
+ */
+
 app.post('/weather', async (req, res) => {
     const city = req.body.city;
     try {

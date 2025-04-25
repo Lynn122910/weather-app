@@ -10,6 +10,7 @@
      <script src="https://cdn.jsdelivr.net/npm/pinyin4js@latest/dist/pinyin4js.min.js"></script>
      <!-- 引入axios库 -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="service-registry.js"></script>
 </head>
 
 <body>
@@ -68,28 +69,29 @@ async function checkWeather(city) {
         city=chineseToPinyin(city);
     }
 
-    // const response = await fetch(apiUrl+city+`&appid=${apiKey}`);
     try{ 
-
-    // if(response.status == 404){
-    //     document.querySelector(".error").style.display="block";
-    //     document.querySelector(".weather").style.display = "none";
-    // }
-
-    //调搜索服务
-        const searchResponse = await axios.post('http://localhost:3001/search',{city},{
-            timeout: 5000
-        });
-        const validatedCity = searchResponse.data.city;
-    //调天气查询服务
-        const weatherResponse = await axios.post('http://localhost:3002/weather',{city: validatedCity },{
-            timeout: 5000
-        });
-        const data = weatherResponse.data;
-        // var data = await response.json();
+    // //调搜索服务
+    //     const searchResponse = await axios.post('http://localhost:3001/search',{city},{
+    //         timeout: 5000
+    //     });
+    //     const validatedCity = searchResponse.data.city;
+    // //调天气查询服务
+    //     const weatherResponse = await axios.post('http://localhost:3002/weather',{city: validatedCity },{
+    //         timeout: 5000
+    //     });
+    //     const data = weatherResponse.data;
     
-        // console.log(data);
+    // 从服务注册表中获取搜索服务的地址
+        const searchServiceUrl = serviceRegistry.searchService;
+        const searchResponse = await axios.post(`${searchServiceUrl}/search`, { city });
+        const validatedCity = searchResponse.data.city;
 
+        // 从服务注册表中获取天气查询服务的地址
+        const weatherServiceUrl = serviceRegistry.weatherService;
+        const weatherResponse = await axios.post(`${weatherServiceUrl}/weather`, { city: validatedCity });
+        const data = weatherResponse.data;
+
+        // console.log(data);
         document.querySelector(".city").innerHTML = originalCity;
         document.querySelector(".temp").innerHTML = Math.round(data.main.temp)+"°c";
         document.querySelector(".humidity").innerHTML = data.main.humidity+"%";
@@ -112,6 +114,7 @@ async function checkWeather(city) {
         document.querySelector(".weather").style.display="block";//显示
         document.querySelector(".error").style.display = "none";//隐藏
         }catch(error){
+            console.error('请求出错:', error);
             document.querySelector(".error").style.display = "block";
             document.querySelector(".weather").style.display = "none";
         }

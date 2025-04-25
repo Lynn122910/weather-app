@@ -9,7 +9,14 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
-//城市名称验证
+/**
+ * 城市名称验证服务
+ * @param {Object} req - 请求对象，包含城市名称
+ * @param {string} req.body.city - 城市名称
+ * @returns {Object} res - 响应对象
+ * @returns {string} res.body.city - 验证后的城市名称
+ * @returns {string} res.body.error - 错误信息（如果有）
+ */
 app.post(`/search`, (req, res) => {
     const city = req.body.city;
     if (!city) {
