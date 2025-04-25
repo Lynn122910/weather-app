@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="style.css">
     <!-- 引入pinyin4js库 -->
      <script src="https://cdn.jsdelivr.net/npm/pinyin4js@latest/dist/pinyin4js.min.js"></script>
+     <!-- 引入axios库 -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -47,8 +49,8 @@
 
 <script>
 
-const apiKey = "d05058736ec59342f611b738e32d7a1c";
-const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&lang=zh_cn&q=";//修改语言
+// const apiKey = "d05058736ec59342f611b738e32d7a1c";
+// const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&lang=zh_cn&q=";//修改语言
 
 const searchBox = document.querySelector(".search input");
 const searchBtn = document.querySelector(".search button");
@@ -66,43 +68,57 @@ async function checkWeather(city) {
         city=chineseToPinyin(city);
     }
 
-    const response = await fetch(apiUrl+city+`&appid=${apiKey}`);
+    // const response = await fetch(apiUrl+city+`&appid=${apiKey}`);
+    try{ 
 
-    if(response.status == 404){
-        document.querySelector(".error").style.display="block";
-        document.querySelector(".weather").style.display = "none";
-    }
+    // if(response.status == 404){
+    //     document.querySelector(".error").style.display="block";
+    //     document.querySelector(".weather").style.display = "none";
+    // }
 
-    var data = await response.json();
+    //调搜索服务
+        const searchResponse = await axios.post('http://localhost:3001/search',{city},{
+            timeout: 5000
+        });
+        const validatedCity = searchResponse.data.city;
+    //调天气查询服务
+        const weatherResponse = await axios.post('http://localhost:3002/weather',{city: validatedCity },{
+            timeout: 5000
+        });
+        const data = weatherResponse.data;
+        // var data = await response.json();
     
-    // console.log(data);
+        // console.log(data);
 
-    document.querySelector(".city").innerHTML = originalCity;
-    document.querySelector(".temp").innerHTML = Math.round(data.main.temp)+"°c";
-    document.querySelector(".humidity").innerHTML = data.main.humidity+"%";
-    document.querySelector(".wind").innerHTML = data.wind.speed+"km/h";
+        document.querySelector(".city").innerHTML = originalCity;
+        document.querySelector(".temp").innerHTML = Math.round(data.main.temp)+"°c";
+        document.querySelector(".humidity").innerHTML = data.main.humidity+"%";
+        document.querySelector(".wind").innerHTML = data.wind.speed+"km/h";
 
-    if(data.weather[0].main == "Clouds"){
-        weatherIcon.src = "images/clouds.png";
-    }else if(data.weather[0].main == "Clear"){
-        weatherIcon.src = "images/clear.png";
-    } else if (data.weather[0].main == "Rain"){
-        weatherIcon.src = "images/rain.png";
-    } else if (data.weather[0].main == "Drizzle"){
-        weatherIcon.src = "images/drizzle.png";
-    } else if (data.weather[0].main == "Mist"){
-        weatherIcon.src = "images/mist.png";
-    } else if (data.weather[0].main == "Snow") {
-        weatherIcon.src = "images/snow.png";
-    } 
+        if(data.weather[0].main == "Clouds"){
+            weatherIcon.src = "images/clouds.png";
+        }else if(data.weather[0].main == "Clear"){
+            weatherIcon.src = "images/clear.png";
+        } else if (data.weather[0].main == "Rain"){
+            weatherIcon.src = "images/rain.png";
+        } else if (data.weather[0].main == "Drizzle"){
+            weatherIcon.src = "images/drizzle.png";
+        } else if (data.weather[0].main == "Mist"){
+            weatherIcon.src = "images/mist.png";
+        } else if (data.weather[0].main == "Snow") {
+            weatherIcon.src = "images/snow.png";
+        } 
 
-    document.querySelector(".weather").style.display="block";//显示
-    document.querySelector(".error").style.display = "none";//隐藏
-}
-searchBtn.addEventListener("click",()=>{
-    checkWeather(searchBox.value);
-})
-
+        document.querySelector(".weather").style.display="block";//显示
+        document.querySelector(".error").style.display = "none";//隐藏
+        }catch(error){
+            document.querySelector(".error").style.display = "block";
+            document.querySelector(".weather").style.display = "none";
+        }
+    }
+    searchBtn.addEventListener("click",()=>{
+        checkWeather(searchBox.value);
+    });
 </script>
 
 </body>
