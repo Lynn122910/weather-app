@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html>  
+<html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,8 @@
     <!-- link:css -->
     <link rel="stylesheet" href="style.css">
     <!-- 引入pinyin4js库 -->
-     <script src="https://cdn.jsdelivr.net/npm/pinyin4js@latest/dist/pinyin4js.min.js"></script>
-     <!-- 引入axios库 -->
+    <script src="https://cdn.jsdelivr.net/npm/pinyin4js@latest/dist/pinyin4js.min.js"></script>
+    <!-- 引入axios库 -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="service-registry.js"></script>
 </head>
@@ -16,8 +17,7 @@
 <body>
     <div class="card">
         <div class="search">
-            <input type="text" placeholder="输入城市"
-            spellcheck="false">
+            <input type="text" placeholder="输入城市" spellcheck="false">
             <button><img src="images/search.png"></button>
         </div>
 
@@ -48,81 +48,54 @@
         </div>
     </div>
 
-<script>
+    <script>
 
-// const apiKey = "d05058736ec59342f611b738e32d7a1c";
-// const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&lang=zh_cn&q=";//修改语言
+        const searchBox = document.querySelector(".search input");
+        const searchBtn = document.querySelector(".search button");
+        const weatherIcon = document.querySelector(".weather-icon");
 
-const searchBox = document.querySelector(".search input");
-const searchBtn = document.querySelector(".search button");
-const weatherIcon = document.querySelector(".weather-icon");
+        async function checkWeather(city) {
+            try {
+                const searchServiceUrl = serviceRegistry.searchService;
+                const searchResponse = await axios.post(`${searchServiceUrl}/search`, { city });
+                const locationID = searchResponse.data.locationID;
 
-//中文转拼音
-function chineseToPinyin(city){
-    return PinyinHelper.convertToPinyinString(city,'',PinyinFormat.WITHOUT_TONE);
-}
+                // 从服务注册表中获取天气查询服务的地址
+                const weatherServiceUrl = serviceRegistry.weatherService;
+                const weatherResponse = await axios.post(`${weatherServiceUrl}/weather`, { locationID });
+                const data = weatherResponse.data;
 
-async function checkWeather(city) {
-    let originalCity = city;
-    //检查，若为中文则转换成拼音
-    if(/[\u4e00-\u9fa5]/.test(city)){
-        city=chineseToPinyin(city);
-    }
+                // console.log(data);
+                document.querySelector(".city").innerHTML = city;
+                document.querySelector(".temp").innerHTML = data.now.temp + "°C";
+                document.querySelector(".humidity").innerHTML = data.now.humidity + "%";
+                document.querySelector(".wind").innerHTML = data.now.windSpeed + "km/h";
 
-    try{ 
-    // //调搜索服务
-    //     const searchResponse = await axios.post('http://localhost:3001/search',{city},{
-    //         timeout: 5000
-    //     });
-    //     const validatedCity = searchResponse.data.city;
-    // //调天气查询服务
-    //     const weatherResponse = await axios.post('http://localhost:3002/weather',{city: validatedCity },{
-    //         timeout: 5000
-    //     });
-    //     const data = weatherResponse.data;
-    
-    // 从服务注册表中获取搜索服务的地址
-        const searchServiceUrl = serviceRegistry.searchService;
-        const searchResponse = await axios.post(`${searchServiceUrl}/search`, { city });
-        const validatedCity = searchResponse.data.city;
+                const weatherText = data.now.text;
+                if (weatherText.includes("雨")) {
+                    weatherIcon.src = "images/rain.png";
+                } else if (weatherText.includes("晴")) {
+                    weatherIcon.src = "images/clear.png";
+                } else if (weatherText.includes("多云")) {
+                    weatherIcon.src = "images/clouds.png";
+                } else if (weatherText.includes("雪")) {
+                    weatherIcon.src = "images/snow.png";
+                } else {
+                    weatherIcon.src = "images/mist.png"; // 其他天气默认显示雾图标
+                }
 
-        // 从服务注册表中获取天气查询服务的地址
-        const weatherServiceUrl = serviceRegistry.weatherService;
-        const weatherResponse = await axios.post(`${weatherServiceUrl}/weather`, { city: validatedCity });
-        const data = weatherResponse.data;
-
-        // console.log(data);
-        document.querySelector(".city").innerHTML = originalCity;
-        document.querySelector(".temp").innerHTML = Math.round(data.main.temp)+"°c";
-        document.querySelector(".humidity").innerHTML = data.main.humidity+"%";
-        document.querySelector(".wind").innerHTML = data.wind.speed+"km/h";
-
-        if(data.weather[0].main == "Clouds"){
-            weatherIcon.src = "images/clouds.png";
-        }else if(data.weather[0].main == "Clear"){
-            weatherIcon.src = "images/clear.png";
-        } else if (data.weather[0].main == "Rain"){
-            weatherIcon.src = "images/rain.png";
-        } else if (data.weather[0].main == "Drizzle"){
-            weatherIcon.src = "images/drizzle.png";
-        } else if (data.weather[0].main == "Mist"){
-            weatherIcon.src = "images/mist.png";
-        } else if (data.weather[0].main == "Snow") {
-            weatherIcon.src = "images/snow.png";
-        } 
-
-        document.querySelector(".weather").style.display="block";//显示
-        document.querySelector(".error").style.display = "none";//隐藏
-        }catch(error){
-            console.error('请求出错:', error);
-            document.querySelector(".error").style.display = "block";
-            document.querySelector(".weather").style.display = "none";
+                document.querySelector(".weather").style.display = "block";
+                document.querySelector(".error").style.display = "none";
+            } catch (error) {
+                console.error('请求出错:', error);
+                document.querySelector(".error").style.display = "block";
+                document.querySelector(".weather").style.display = "none";
+            }
         }
-    }
-    searchBtn.addEventListener("click",()=>{
-        checkWeather(searchBox.value);
-    });
-</script>
+        searchBtn.addEventListener("click", () => {
+            checkWeather(searchBox.value);
+        });
+    </script>
 
 </body>
 

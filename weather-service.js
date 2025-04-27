@@ -1,34 +1,25 @@
 const express = require(`express`);
 const cors = require('cors');
+const axios = require('axios');
 const app = express();
 const port = 3002;
-const axios = require('axios');
-const { log } = require('console');
+const apikey = "8afa3b09dd2b4e9e81a343a5849ca454";
 
 app.use(cors());
 app.use(express.json());
 
-const apiKey = "d05058736ec59342f611b738e32d7a1c";
-const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&lang=zh_cn&q=";//修改语言
-
-
-/**
- * 天气查询服务
- * @param {Object} req - 请求对象，包含城市名称
- * @param {string} req.body.city - 城市名称
- * @returns {Object} res - 响应对象
- * @returns {Object} res.body - 天气信息
- * @returns {string} res.body.error - 错误信息（如果有）
- */
-
 app.post('/weather', async (req, res) => {
-    const city = req.body.city;
+    const locationID = req.body.locationID;
+    if (!locationID) {
+        return res.status(400).json({ error: "locationID不能为空" });
+    }
     try {
-        const response = await axios.get(apiUrl + city + `&appid=${apiKey}`,{
-            timeout:5000 //设置超时时间5秒
-        });
-        res.json(response.data);
+        const weatherResponse = await axios.get(
+            `https://nn3yfq4ybh.re.qweatherapi.com/v7/weather/now?location=${locationID}&key=${apikey}`
+        );
+        res.json(weatherResponse.data);
     } catch (error) {
+        console.error("天气查询失败:", error);
         res.status(404).json({ error: '未找到该城市的天气信息' });
     }
 });

@@ -1,28 +1,32 @@
 //创建express服务器
-const { log } = require('console');
 const express = require('express');
 const cors = require('cors');
+const axios = require('axios');
 const app = express();
 const port = 3001;
+const apikey = "8afa3b09dd2b4e9e81a343a5849ca454";
 
-//添加cors中间件 解决跨域请求问题
 app.use(cors());
 app.use(express.json());
 
-/**
- * 城市名称验证服务
- * @param {Object} req - 请求对象，包含城市名称
- * @param {string} req.body.city - 城市名称
- * @returns {Object} res - 响应对象
- * @returns {string} res.body.city - 验证后的城市名称
- * @returns {string} res.body.error - 错误信息（如果有）
- */
-app.post(`/search`, (req, res) => {
-    const city = req.body.city;
+app.post(`/search`, async(req, res) => {
+    const city = req.body.city.trim();
     if (!city) {
         res.status(400).json({ error: '城市名称不能为空' });
-    } else {
-        res.json({ city });
+    } 
+    try{
+        const geoResponse = await axios.get(
+            `https://nn3yfq4ybh.re.qweatherapi.com/geo/v2/city/lookup?location=${city}&key=${apikey}`
+        );
+        const locations = geoResponse.data.location;
+        if (locations.length === 0) {
+            return res.status(404).json({ error: "未找到该城市" });
+        }
+        const locationID = locations[0].id; 
+        res.json({ locationID });
+    } catch (error) {
+        console.error("GEO搜索失败:", error);
+        res.status(500).json({ error: "城市搜索服务失败" });
     }
 });
 
