@@ -1,80 +1,134 @@
 *{
-    margin:0;
-    padding:0;
-    /* 元素字体Poppins中文丑丑的 */
-    /* font-family: 'Poppins',sans-serif; */
-    /* 盒模型计算方式：宽高不包含外边距 */
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
-body{
-    background:black;
-    background-color: black;
+html,body{
+        height: 100%;
+        background: linear-gradient(135deg, #3fd2ab, #5464d9);
+        /* color:#fff */
+        color: #ffffff;
 }
+
+
+.header{
+    position: sticky;
+    top:0; 
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding:15px 0;  
+    & #city_input{
+            border: 0;
+            outline: 0;
+            background: #ebfffc;
+            color: #555;
+            padding: 12px;
+            font-size: 16px;
+            /* height: 60px; */
+            border-radius: 25px;
+            flex: 1;
+            margin-right: 50px;
+            font-size: 15px;
+        }
+    & #searchBtn{
+        color: #4f4e4e;
+        margin-right: 10px;
+        margin-left: -40px;
+        border: none;
+        font-size: 16px;
+        padding: 12px;
+        border-radius: 25px;
+        cursor: pointer;
+    }
+    & #locationBtn {
+        margin-right: 20px;
+        color: #4f4e4e;
+        border: none;
+        font-size: 15px;
+        padding: 12px;
+        border-radius: 25px;
+        cursor: pointer;
+    }
+}
+
+
+
 
 .card{
-    width: 90%;
-    max-width: 470px;
-    background: linear-gradient(135deg,#00feba,#5b548a);
-    color: #fff;
-    margin: 100px auto 0;
-    /* 边框圆角 */
-    border-radius: 20px; 
-    padding: 40px 35px;
-    text-align:center
+    
+    background: linear-gradient(135deg, #b4ebdc, #a1a9e8);
+    padding:15px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    & p{
+        font-size: 14px;
+    }
+    & h2{
+        font-size: 32px;
+        font-weight: 500;
+    }
+    & .card-footer{
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+    & .forecast-item{
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        place-items: center;
+        margin-bottom: 15px;
+        & .icon-wrapper{
+            display: flex;
+            align-items: center;
+        }
+    }
 }
 
-.search{
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.weather-data {
+    /* display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px; */
+    &.weather-left {
+        grid-column: span 1;
+        & .current-weather {
+            
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            & h2{
+                margin: 7px 0;
+            }
+            & p{
+                color: #4f4e4e;
+            }
+        }
+    }
+
+    & .weather-right {
+        grid-column: span 3;
+        & h2{
+            margin-bottom: 10px;
+        }
+        & .highlights{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            column-gap: 15px;
+            & .card{
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+                font-weight: 500;
+                color: #ffffff;
+                padding:5px 10px;
+                border-radius: 15px;
+            }
+        }
+    }
 }
 
-.search input{
-    /* 边框宽 */
-    border: 0; 
-    outline: 0;
-    background: #ebfffc;
-    color:#555;
-    padding: 10px 25px;
-    height: 60px;
-    border-radius: 30px;
-    flex:1;
-    margin-right: 16px;
-    font-size: 18px;
-}
 
-.search button{
-    border: 0;
-    outline: 0;
-    background: #ebfffc;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    /* 鼠标变手 */
-    cursor: pointer;
-}
-
-.search button img{
-    width: 16px;
-}
-
-.weather-icon{
-    width: 170px;
-    margin-top: 30px;
-}
-
-.weather h1{
-    font-size: 80px;
-    font-weight: 500;
-}
-
-.weather h2 {
-    font-size: 45px;
-    font-weight: 400;
-    margin-top: -10px;
-}
 
 .details{
     display: flex;
@@ -82,23 +136,18 @@ body{
     justify-content: space-between;
     padding: 0 20px;
     margin-top: 50px;
+    justify-content: center;
+    gap: 40px;
 }
 
-.col{
-    display: flex;
-    align-items: center;
-    text-align:left;
-}
 
-.col img{
+
+.card img{
     width: 40px;
     margin-right: 10px;
 }
 
-.humidity, .wind{
-    font-size: 28px;
-    margin-top: -6px;
-}
+
 
 /* 默认不显示weather，查询后显示 */
 .weather{
@@ -111,4 +160,25 @@ body{
     font-size: 16px;
     margin-top: 20px;
     display:none
+}
+
+
+
+/* 响应式调整 */
+@media (max-width: 1100px) {
+    .weather{
+        grid-template-columns: repeat(3,1fr);
+        & .weather-right{
+            grid-column: span 2;
+            & .highlights{
+                grid-template-columns: repeat(4,1fr);
+            }
+        }
+    }
+}
+
+@media(max-width: 380px){
+    .weather-data.highlights.card{
+        grid-template-columns: repeat(2,1fr);
+    }
 }
