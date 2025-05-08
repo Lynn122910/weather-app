@@ -18,6 +18,7 @@ app.post('/dailyweather', async (req, res) => {
             `https://nn3yfq4ybh.re.qweatherapi.com/v7/weather/7d?location=${locationID}&key=${apikey}`
         );
         res.json(dailyWeatherResponse.data);
+        console.log(dailyWeatherResponse.data);
     } catch (error) {
         console.error("7天天气查询失败:", error);
         res.status(404).json({ error: '未找到该城市的未来7日天气信息' });

@@ -18,6 +18,7 @@ app.post('/weather', async (req, res) => {
             `https://nn3yfq4ybh.re.qweatherapi.com/v7/weather/now?location=${locationID}&key=${apikey}`
         );
         res.json(weatherResponse.data);
+        console.log(weatherResponse.data);
     } catch (error) {
         console.error("天气查询失败:", error);
         res.status(404).json({ error: '未找到该城市的天气信息' });

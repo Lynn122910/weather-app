@@ -1,65 +1,101 @@
+import serviceRegistry from './service-registry.js';
 
-    import serviceRegistry from './service-registry.js';
+let cityInput = document.getElementById('city_input'),
+    searchBtn = document.getElementById('searchBtn'),
+    currentWeatherCard = document.querySelector('.weather-data .card'),
+    sevenDaysForecast = document.querySelector('.day-forecast');
 
-    let cityInput = document.getElementById('city_input'),
+async function checkWeather() {
+    let city = cityInput.value.trim();
+    console.log(city);
+    cityInput.value = "";//清空输入框，为下一次查询做准备
+    if (!city) return;
 
+    try {
+        // 显示加载状态
+        document.querySelector('.weather-data').style.display = 'none';
+        document.querySelector('.error').style.display = 'none';
 
-    // const searchBox = document.querySelector(".search input");
-    searchBtn = document.getElementById(' searchBtn');
+        //获得城市查询ID
+        const searchServiceUrl = serviceRegistry.searchService;
+        const searchResponse = await axios.post(`${searchServiceUrl}/search`, { city });
 
-    // weatherIcon = document.querySelector(".weather-icon");
- 
-    async function checkWeather() {
-        let city=cityInput.value.trim();
-        console.log(city);
-
-        try {
-            //��ó��в�ѯID
-            const searchServiceUrl = serviceRegistry.searchService;
-            const searchResponse = await axios.post(`${searchServiceUrl}/search`, {city});
-            const locationID = searchResponse.data.locationID;
-
-    //��ǰ������ѯ����
-    const weatherServiceUrl = serviceRegistry.weatherService;
-    const weatherResponse = await axios.post(`${weatherServiceUrl}/weather`, {locationID});
-    const data = weatherResponse.data;
-
-    //7��������ѯ����
-    const dailyWeatherServiceUrl = serviceRegistry.dailyWeatherService;
-    const dailyWeatherResponse = await axios.post(`${dailyWeatherServiceUrl}/dailyweather`, {locationID});
-    const dailyData = dailyWeatherResponse.data;
-
-    // console.log(data);
-    document.querySelector(".city").innerHTML = city;
-    document.querySelector(".temp").innerHTML = data.now.temp + "��C";
-    document.querySelector(".humidity").innerHTML = data.now.humidity + "%";
-    document.querySelector(".wind").innerHTML = data.now.windSpeed + "km/h";
-
-    console.log(data.now.text);
-
-    updateWeatherIcon(data.now.text);
-
-
-    document.querySelector(".weather").style.display = "block";
-    document.querySelector(".error").style.display = "none";
-            } catch (error) {
-        console.error('�������:', error);
-    document.querySelector(".error").style.display = "block";
-    document.querySelector(".weather").style.display = "none";
-    hourlyScroll.innerHTML = "";
-    dailyCards.innerHTML = "";
-            }
+        if (!searchResponse.data || !searchResponse.data.locationID) {
+            throw new Error('未找到城市信息');
         }
 
-    function updateWeatherIcon(text) {
-                if (text.includes("��")) weatherIcon.src = "images/rain.png";
-    else if (text.includes("��")) weatherIcon.src = "images/clear.png";
-    else if (text.includes("����")) weatherIcon.src = "images/clouds.png";
-    else if (text.includes("ѩ")) weatherIcon.src = "images/snow.png";
-    else weatherIcon.src = "images/mist.png";
-            }
+        const locationID = searchResponse.data.locationID;
 
-    searchBtn.addEventListener("click", () => {
-        checkWeather(cityInput);
-    });
-        
+        //当前天气查询服务
+        const weatherServiceUrl = serviceRegistry.weatherService;
+        const weatherResponse = await axios.post(`${weatherServiceUrl}/weather`, { locationID });
+        const data = weatherResponse.data;
+
+        if (!data || !data.now) {
+            throw new Error('获取天气数据失败');
+        }
+
+        //更新当前天气卡片
+        currentWeatherCard.innerHTML = `
+            <div class="current-weather">
+                <div class="details">
+                    <p>当前天气</p>
+                    <h2>${data.now.temp}°C</h2>
+                    <p>${data.now.text}</p>
+                </div>
+                <div class="weather-icon">
+                    <i class="qi-${data.now.icon}"></i>
+                </div>
+            </div>
+            <hr>
+            <div class="card-footer">
+                <p><i class="fa-light fa-calendar"></i>${new Date().toLocaleDateString()}</p>
+                <p id="cityName"><i class="fa-light fa-location-dot"></i>${city}</p>
+            </div>
+        `;
+
+        //7天天气预报
+        const dailyWeatherServiceUrl = serviceRegistry.dailyWeatherService;
+        const dailyWeatherResponse = await axios.post(`${dailyWeatherServiceUrl}/dailyweather`, { locationID });
+        const dailyData = dailyWeatherResponse.data;
+        if (!dailyData || !dailyData.daily) {
+            throw new Error('获取7天天气数据失败');
+        }
+        console.log(dailyData);
+
+        // 更新7天天气预报
+        sevenDaysForecast.innerHTML = dailyData.daily.map(day => {
+            const date = new Date(day.fxDate);
+            const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            const weekday = weekdays[date.getDay()];
+            const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
+
+            return `
+                <div class="forecast-item">
+                    <div class="icon-wrapper">
+                        <i class="qi-${day.iconDay}"></i>
+                        <span>${day.tempMin}°C / ${day.tempMax}°C</span>
+                    </div>
+                    <p>${formattedDate}</p>
+                    <p>${weekday}</p>
+                </div>
+            `;
+        }).join('');
+
+        // 显示天气数据
+        document.querySelector('.weather-data').style.display = 'block';
+        document.querySelector('.error').style.display = 'none';
+
+        // 清空输入框
+        cityInput.value = "";
+
+    } catch (error) {
+        console.error('请求出错:', error);
+        document.querySelector('.error').style.display = 'block';
+        document.querySelector('.weather-data').style.display = 'none';
+    }
+}
+
+searchBtn.addEventListener("click", () => {
+    checkWeather();
+});
