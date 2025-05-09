@@ -3,7 +3,8 @@ import serviceRegistry from './service-registry.js';
 let cityInput = document.getElementById('city_input'),
     searchBtn = document.getElementById('searchBtn'),
     currentWeatherCard = document.querySelector('.weather-data .card'),
-    sevenDaysForecast = document.querySelector('.day-forecast');
+    sevenDaysForecast = document.querySelector('.day-forecast'),
+    Cards = document.querySelector('.highlights');
 
 async function checkWeather() {
     let city = cityInput.value.trim();
@@ -54,6 +55,7 @@ async function checkWeather() {
             </div>
         `;
 
+
         //7天天气预报
         const dailyWeatherServiceUrl = serviceRegistry.dailyWeatherService;
         const dailyWeatherResponse = await axios.post(`${dailyWeatherServiceUrl}/dailyweather`, { locationID });
@@ -62,6 +64,36 @@ async function checkWeather() {
             throw new Error('获取7天天气数据失败');
         }
         console.log(dailyData);
+
+
+        Cards.innerHTML = `
+            <div class="card">
+                <p>日出时间</p>
+                <p>${dailyData.daily[0].sunrise}</p>
+            </div>
+            <div class="card">
+                <p>日落时间</p>
+                <p>${dailyData.daily[0].sunset}</p>
+            </div>
+            <div class="card" >
+                <i class="fa-regular fa-wind fa-3x"></i>
+                <p>风速</p>
+                <p>${data.now.windSpeed}km/h</p>
+            </div>
+            <div class="card">
+                <img src="images/humidity.png">
+                <p>相对湿度</p>
+                <p>${data.now.humidity}%</p>
+            </div>
+            <div class="card">
+                <p>风向</p>
+                <p>${data.now.windDir}</p>
+            </div>
+            <div class="card">
+                <p>能见度</p>
+                <p>${data.now.vis}km</p>
+            </div>
+        `;
 
         // 更新7天天气预报
         sevenDaysForecast.innerHTML = dailyData.daily.map(day => {

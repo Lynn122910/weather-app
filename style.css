@@ -87,9 +87,6 @@ html,body{
 }
 
 .weather-data {
-    /* display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px; */
     &.weather-left {
         grid-column: span 1;
         & .current-weather {
@@ -113,7 +110,7 @@ html,body{
         }
         & .highlights{
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             column-gap: 15px;
             & .card{
                 display: flex;
