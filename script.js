@@ -8,8 +8,7 @@ let cityInput = document.getElementById('city_input'),
 
 async function checkWeather() {
     let city = cityInput.value.trim();
-    console.log(city);
-    cityInput.value = "";//清空输入框，为下一次查询做准备
+    cityInput.value = "";
     if (!city) return;
 
     try {
@@ -20,18 +19,15 @@ async function checkWeather() {
         //获得城市查询ID
         const searchServiceUrl = serviceRegistry.searchService;
         const searchResponse = await axios.post(`${searchServiceUrl}/search`, { city });
-
         if (!searchResponse.data || !searchResponse.data.locationID) {
             throw new Error('未找到城市信息');
         }
-
         const locationID = searchResponse.data.locationID;
 
         //当前天气查询服务
         const weatherServiceUrl = serviceRegistry.weatherService;
         const weatherResponse = await axios.post(`${weatherServiceUrl}/weather`, { locationID });
         const data = weatherResponse.data;
-
         if (!data || !data.now) {
             throw new Error('获取天气数据失败');
         }
