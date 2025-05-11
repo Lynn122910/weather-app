@@ -6,25 +6,27 @@ let cityInput = document.getElementById('city_input'),
     sevenDaysForecast = document.querySelector('.day-forecast'),
     Cards = document.querySelector('.highlights');
 
-async function checkWeather() {
-    let city = cityInput.value.trim();
-    cityInput.value = "";
-    if (!city) return;
+async function checkWeather(cityOrLocationID) {
+    if (!cityOrLocationID) return;
 
     try {
         // 显示加载状态
         document.querySelector('.weather-data').style.display = 'none';
         document.querySelector('.error').style.display = 'none';
 
-        //获得城市查询ID
-        const searchServiceUrl = serviceRegistry.searchService;
-        const searchResponse = await axios.post(`${searchServiceUrl}/search`, { city });
-        if (!searchResponse.data || !searchResponse.data.locationID) {
-            throw new Error('未找到城市信息');
-        }
-        const locationID = searchResponse.data.locationID;
+        let locationID = cityOrLocationID;
+        let cityName = cityOrLocationID;
 
-        //当前天气查询服务
+        if (!/^\d{9}$/.test(cityOrLocationID)) {
+            const searchServiceUrl = serviceRegistry.searchService;
+            const searchResponse = await axios.post(`${searchServiceUrl}/search`, { city: cityOrLocationID });
+            if (!searchResponse.data || !searchResponse.data.locationID) {
+                throw new Error('未找到城市信息');
+            }
+            locationID = searchResponse.data.locationID;
+            cityName = cityOrLocationID;
+        }
+
         const weatherServiceUrl = serviceRegistry.weatherService;
         const weatherResponse = await axios.post(`${weatherServiceUrl}/weather`, { locationID });
         const data = weatherResponse.data;
@@ -32,7 +34,6 @@ async function checkWeather() {
             throw new Error('获取天气数据失败');
         }
 
-        //更新当前天气卡片
         currentWeatherCard.innerHTML = `
             <div class="current-weather">
                 <div class="details">
@@ -47,20 +48,16 @@ async function checkWeather() {
             <hr>
             <div class="card-footer">
                 <p><i class="fa-light fa-calendar"></i>${new Date().toLocaleDateString()}</p>
-                <p id="cityName"><i class="fa-light fa-location-dot"></i>${city}</p>
+                <p id="cityName"><i class="fa-light fa-location-dot"></i>${cityName}</p>
             </div>
         `;
 
-
-        //7天天气预报
         const dailyWeatherServiceUrl = serviceRegistry.dailyWeatherService;
         const dailyWeatherResponse = await axios.post(`${dailyWeatherServiceUrl}/dailyweather`, { locationID });
         const dailyData = dailyWeatherResponse.data;
         if (!dailyData || !dailyData.daily) {
             throw new Error('获取7天天气数据失败');
         }
-        console.log(dailyData);
-
 
         Cards.innerHTML = `
             <div class="card">
@@ -95,7 +92,6 @@ async function checkWeather() {
             const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
             const weekday = weekdays[date.getDay()];
             const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
-
             return `
                 <div class="forecast-item">
                     <div class="icon-wrapper">
@@ -112,9 +108,6 @@ async function checkWeather() {
         document.querySelector('.weather-data').style.display = 'block';
         document.querySelector('.error').style.display = 'none';
 
-        // 清空输入框
-        cityInput.value = "";
-
     } catch (error) {
         console.error('请求出错:', error);
         document.querySelector('.error').style.display = 'block';
@@ -123,5 +116,29 @@ async function checkWeather() {
 }
 
 searchBtn.addEventListener("click", () => {
-    checkWeather();
+    checkWeather(cityInput.value.trim());
+    cityInput.value = "";
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                try {
+                    const locationServiceUrl = serviceRegistry.locationService;
+                    const locationResponse = await axios.post(`${locationServiceUrl}/location`, { lat, lon });
+                    if (locationResponse.data && locationResponse.data.locationID) {
+                        checkWeather(locationResponse.data.locationID);
+                    }
+                } catch (e) {
+                    console.warn('自动定位失败', e);
+                }
+            },
+            (error) => {
+                console.warn('获取地理位置失败:', error);
+            }
+        );
+    }
 });
