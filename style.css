@@ -25,7 +25,7 @@ body {
     & #city_input {
         border: 0;
         outline: 0;
-        background: #ebfffc;
+        background: rgba(235, 255, 252, 0.9);
         color: #555;
         padding: 12px;
         font-size: 16px;
@@ -47,12 +47,12 @@ body {
         cursor: pointer;
     }
 
+    & #searchBtn,
     & #locationBtn {
-        margin-right: 20px;
         color: #4f4e4e;
         border: none;
         font-size: 15px;
-        padding: 12px;
+        padding: 12px 20px;
         border-radius: 25px;
         cursor: pointer;
     }
@@ -68,13 +68,13 @@ body {
     margin-bottom: 15px;
 
     & p {
-        font-size: 16px;
+        font-size: 18px;
+        font-weight: 400;
     }
 
     & h2 {
-        font-size: 42px;
+        font-size: 30px;
         font-weight: 600;
-        margin: 15px 0;
     }
 
     & .card-footer {
@@ -87,7 +87,7 @@ body {
 
         & p {
             font-size: 18px;
-            color: #2c3e50;
+            color: #f5f9fe;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -103,6 +103,7 @@ body {
         grid-template-columns: repeat(3, 1fr);
         place-items: center;
         margin-bottom: 15px;
+        padding: 10px;
 
         & .icon-wrapper {
             display: flex;
@@ -115,7 +116,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 30px;
+    padding: 10px 15px;
 }
 
 .weather-data {
@@ -126,9 +127,10 @@ body {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 15px 20px;
 
             & h2 {
-                margin: 7px 0;
+                margin: 5px 0;
             }
 
             & p {
@@ -141,7 +143,8 @@ body {
         grid-column: span 3;
 
         & h2 {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 28px;
         }
 
         & .highlights {
@@ -157,6 +160,16 @@ body {
                 color: #ffffff;
                 padding: 5px 10px;
                 border-radius: 15px;
+                min-height: 50px;
+
+                & p:first-child {
+                    font-size: 18px;
+                    margin-bottom: 10px;
+                }
+
+                & p:last-child {
+                    font-size: 18x;
+                }
             }
         }
     }
@@ -170,7 +183,7 @@ body {
     gap: 15px;
 
     & p:first-child {
-        font-size: 24px;
+        font-size: 20px;
         font-weight: 500;
         color: #ffffff;
     }
@@ -192,7 +205,7 @@ body {
 }
 
 .weather-icon {
-    font-size: 120px;
+    font-size: 100px;
     color: #ffffff;
     margin-left: 40px;
 }
@@ -238,4 +251,75 @@ body {
     .weather-data.highlights.card {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* AI 悬停效果动画 */
+.weather-data {
+    & .highlights {
+        & .card {
+            background: linear-gradient(135deg, rgba(180, 235, 220, 0.8), rgba(161, 169, 232, 0.8));
+            padding: 15px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background: linear-gradient(135deg, rgba(180, 235, 220, 0.95), rgba(161, 169, 232, 0.95));
+            }
+        }
+    }
+}
+
+.forecast-item {
+    transition: all 0.3s ease;
+    padding: 15px;
+    border-radius: 12px;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    & .icon-wrapper {
+        & i {
+            transition: transform 0.3s ease;
+        }
+    }
+
+    &:hover .icon-wrapper i {
+        transform: scale(1.1);
+    }
+}
+
+/* 添加页面加载动画 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.weather-data {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* 优化滚动条样式 */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
 }
