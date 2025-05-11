@@ -45,7 +45,7 @@ async function checkWeather() {
                     <p>${data.now.text}</p>
                 </div>
                 <div class="weather-icon">
-                    <i class="qi-${data.now.icon}"></i>
+                    <i class="qi-${data.now.icon} qi-${data.now.icon}-fill"></i>
                 </div>
             </div>
             <hr>
@@ -75,13 +75,11 @@ async function checkWeather() {
                 <p>日落时间</p>
                 <p>${dailyData.daily[0].sunset}</p>
             </div>
-            <div class="card" >
-                <i class="fa-regular fa-wind fa-3x"></i>
+            <div class="card">
                 <p>风速</p>
                 <p>${data.now.windSpeed}km/h</p>
             </div>
             <div class="card">
-                <img src="images/humidity.png">
                 <p>相对湿度</p>
                 <p>${data.now.humidity}%</p>
             </div>
@@ -105,7 +103,7 @@ async function checkWeather() {
             return `
                 <div class="forecast-item">
                     <div class="icon-wrapper">
-                        <i class="qi-${day.iconDay}"></i>
+                        <i class="qi-${day.iconDay} qi-${day.iconDay}-fill"></i>
                         <span>${day.tempMin}°C / ${day.tempMax}°C</span>
                     </div>
                     <p>${formattedDate}</p>

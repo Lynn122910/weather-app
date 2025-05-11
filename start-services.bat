@@ -1,7 +1,6 @@
 @echo off
 start "搜索服务" cmd /k "node search-service.js"
 start "天气服务" cmd /k "node weather-service.js"
-start "24小时天气服务" cmd /k "node hourly-service.js"
 start "7天天气服务" cmd /k "node daily-service.js"
 
 
