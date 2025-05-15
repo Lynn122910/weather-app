@@ -22,7 +22,9 @@ app.post(`/location`, async (req, res) => {
         if (currentLocation.length === 0) {
             return res.status(404).json({ error: "未找到该城市" });
         }
-        res.json({ locationID: currentLocation[0].id });
+        console.log("当前位置:", currentLocation[0].name);
+        
+        res.json({ city: currentLocation[0].name });
     } catch (error) {
         console.error("当前位置定位失败:", error);
         res.status(500).json({ error: "位置定位服务失败" });

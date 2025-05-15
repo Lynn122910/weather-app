@@ -5,27 +5,22 @@ let cityInput = document.getElementById('city_input'),
     currentWeatherCard = document.querySelector('.weather-data .card'),
     sevenDaysForecast = document.querySelector('.day-forecast'),
     Cards = document.querySelector('.highlights');
-
-async function checkWeather(cityOrLocationID) {
-    if (!cityOrLocationID) return;
+//传入城市名->查天气信息
+async function checkWeather(city) {
+    if (!city) return;
 
     try {
         // 显示加载状态
         document.querySelector('.weather-data').style.display = 'none';
         document.querySelector('.error').style.display = 'none';
 
-        let locationID = cityOrLocationID;
-        let cityName = cityOrLocationID;
-
-        if (!/^\d{9}$/.test(cityOrLocationID)) {
-            const searchServiceUrl = serviceRegistry.searchService;
-            const searchResponse = await axios.post(`${searchServiceUrl}/search`, { city: cityOrLocationID });
-            if (!searchResponse.data || !searchResponse.data.locationID) {
-                throw new Error('未找到城市信息');
-            }
-            locationID = searchResponse.data.locationID;
-            cityName = cityOrLocationID;
+        //调用 search 接口,城市名->locationID
+        const searchServiceUrl = serviceRegistry.searchService;
+        const searchResponse = await axios.post(`${searchServiceUrl}/search`, { city: city });
+        if (!searchResponse.data || !searchResponse.data.locationID) {
+            throw new Error('未找到城市信息');
         }
+        let locationID = searchResponse.data.locationID;
 
         const weatherServiceUrl = serviceRegistry.weatherService;
         const weatherResponse = await axios.post(`${weatherServiceUrl}/weather`, { locationID });
@@ -48,7 +43,7 @@ async function checkWeather(cityOrLocationID) {
             <hr>
             <div class="card-footer">
                 <p><i class="fa-light fa-calendar"></i>${new Date().toLocaleDateString()}</p>
-                <p id="cityName"><i class="fa-light fa-location-dot"></i>${cityName}</p>
+                <p id="cityName"><i class="fa-light fa-location-dot"></i>${city}</p>
             </div>
         `;
 
@@ -126,11 +121,14 @@ window.addEventListener('DOMContentLoaded', () => {
             async (position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
+                console.log("当前经纬度:", lat, lon);
+                
                 try {
                     const locationServiceUrl = serviceRegistry.locationService;
                     const locationResponse = await axios.post(`${locationServiceUrl}/location`, { lat, lon });
-                    if (locationResponse.data && locationResponse.data.locationID) {
-                        checkWeather(locationResponse.data.locationID);
+                    if (locationResponse.data && locationResponse.data.city) {
+                        checkWeather(locationResponse.data.city);
+                        console.log("当前位置:", locationResponse.data.city);
                     }
                 } catch (e) {
                     console.warn('自动定位失败', e);
