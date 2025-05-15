@@ -4,7 +4,8 @@ let cityInput = document.getElementById('city_input'),
     searchBtn = document.getElementById('searchBtn'),
     currentWeatherCard = document.querySelector('.weather-data .card'),
     sevenDaysForecast = document.querySelector('.day-forecast'),
-    Cards = document.querySelector('.highlights');
+    Cards = document.querySelector('.highlights'),
+    locationBtn = document.getElementById('locationBtn');
 //传入城市名->查天气信息
 async function checkWeather(city) {
     if (!city) return;
@@ -123,6 +124,32 @@ window.addEventListener('DOMContentLoaded', () => {
                 const lon = position.coords.longitude;
                 console.log("当前经纬度:", lat, lon);
                 
+                try {
+                    const locationServiceUrl = serviceRegistry.locationService;
+                    const locationResponse = await axios.post(`${locationServiceUrl}/location`, { lat, lon });
+                    if (locationResponse.data && locationResponse.data.city) {
+                        checkWeather(locationResponse.data.city);
+                        console.log("当前位置:", locationResponse.data.city);
+                    }
+                } catch (e) {
+                    console.warn('自动定位失败', e);
+                }
+            },
+            (error) => {
+                console.warn('获取地理位置失败:', error);
+            }
+        );
+    }
+});
+
+locationBtn.addEventListener("click", () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                console.log("当前经纬度:", lat, lon);
+
                 try {
                     const locationServiceUrl = serviceRegistry.locationService;
                     const locationResponse = await axios.post(`${locationServiceUrl}/location`, { lat, lon });
