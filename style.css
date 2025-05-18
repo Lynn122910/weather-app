@@ -7,9 +7,9 @@
 html,
 body {
     height: 100%;
-    background: linear-gradient(135deg, #3fd2ab, #5464d9);
-    /* color:#fff */
-    color: #ffffff;
+    /* background: linear-gradient(135deg, #3fd2ab, #5464d9); */
+    background: linear-gradient(135deg, #3fbf9d, #4a5bdf);
+    color: #f5f5f5;
 }
 
 
@@ -21,7 +21,8 @@ body {
     align-items: center;
     margin-bottom: 10px;
     padding: 15px 0;
-
+    font-size: large;
+    z-index: 1;
     & #city_input {
         border: 0;
         outline: 0;
@@ -62,10 +63,12 @@ body {
 
 
 .card {
-    background: linear-gradient(135deg, #b4ebdc, #a1a9e8);
+    background: linear-gradient(135deg, #8ed3be, #a19fde);
+    /* background: linear-gradient(135deg, #9adac9, #919be6); */
     padding: 25px;
     border-radius: 15px;
     margin-bottom: 15px;
+    font-size: 19px;
 
     & p {
         font-size: 18px;
@@ -77,6 +80,8 @@ body {
         font-weight: 600;
     }
 
+    
+
     & .card-footer {
         display: flex;
         justify-content: space-between;
@@ -86,7 +91,6 @@ body {
         margin-top: 20px;
 
         & p {
-            font-size: 18px;
             color: #f5f9fe;
             display: flex;
             align-items: center;
@@ -98,12 +102,14 @@ body {
         }
     }
 
+
+
     & .forecast-item {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         place-items: center;
-        margin-bottom: 15px;
-        padding: 10px;
+        /* margin-bottom: 15px;
+        padding: 10px; */
 
         & .icon-wrapper {
             display: flex;
@@ -111,6 +117,12 @@ body {
         }
     }
 }
+
+.forecast-item .icon-wrapper img {
+    width: 80px;
+    height: auto;
+}
+
 
 .current-weather {
     display: flex;
@@ -163,12 +175,11 @@ body {
                 min-height: 50px;
 
                 & p:first-child {
-                    font-size: 18px;
-                    margin-bottom: 10px;
+                    font-size: 16px;
                 }
 
                 & p:last-child {
-                    font-size: 18x;
+                    font-size: 15x;
                 }
             }
         }
@@ -183,8 +194,8 @@ body {
     gap: 8px;
 
     & p:first-child {
-        font-size: 16px;
-        font-weight: 500;
+        font-size: 20px;
+        font-weight: 600;
         color: #ffffff;
     }
 
@@ -210,8 +221,8 @@ body {
     margin-left: 25px;
 }
 
-.card img {
-    width: 40px;
+.card .icon-wrapper i {
+    font-size: 25px;
     margin-right: 10px;
 }
 
